@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #e9ecef;
+            font-size: 16px;
+            font-family: monospace;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3rem;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .container input {
+            padding: 1rem;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .container input[type="submit"],
+        .container input[type="reset"] {
+            cursor: pointer;
+        }
+
+        .container h2 {
+            margin-bottom: 1rem;
+        }
+
+        .container .output-box {
+            border: 1px solid #6c757d;
+            margin-top: 2rem;
+            padding: 3rem 1.5rem 1.5rem 1.5rem;
+        }
+
+        .container .copy-text-button {
+            padding: 0.5rem;
+            cursor: pointer;
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .container .minify-amz-url,
+        .container .walmart-product-upc {
+            border: 1px solid #6c757d;
+            padding: 1rem;
+            background-color: #fff;
+        }
+
+        .container .output-box {
+            position: relative;
+        }
+
+        .container .output-box>p {
+            background-color: #e9ecef;
+            width: fit-content;
+        }
+
+        .tooltip {
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: fit-content;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            padding: 5px 5px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 110%;
+            left: -0.65em;
+        }
+
+        .tooltip:active .tooltiptext {
+            visibility: visible;
+        }
+
+        @media only screen and (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.10/clipboard.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="minify-amz-url">
+            <div class="input-box">
+                <h2>Amazon Url Shortener</h2>
+                <form action="" id="getamzform">
+                    <input type="text" id="amzurl" name="url" placeholder="Enter URL" autocomplete="off" />
+                    <input type="submit" value="Minify Url" />
+                    <input type="reset" name="" id="" value="Reset" class="reset-output" />
+                </form>
+            </div>
+            <div class="output-box">
+                <p id="amzoutput">output</p>
+                <div>
+                    <button data-clipboard-action="copy" data-clipboard-target="#amzoutput"
+                        class="copy-text-button tooltip">
+                        <span>Copy</span><span class="tooltiptext">Copied!</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="walmart-product-upc">
+            <div class="input-box">
+                <h2>Product Upc Code - Walmart</h2>
+                <form action="" id="getwalform">
+                    <input type="text" id="walurl" name="url" placeholder="Enter URL" autocomplete="off" />
+                    <input type="submit" value="Get Upc" />
+                    <input type="reset" name="" id="" value="Reset" class="reset-output" />
+                </form>
+            </div>
+            <div class="output-box">
+                <p id="waloutput">sample upc nice copied</p>
+                <div>
+                    <button data-clipboard-action="copy" data-clipboard-target="#waloutput" class="copy-text-button">
+                        Copy
+                    </button>
+                </div>
+            </div>
+        </div> -->
+    </div>
+    <script>
+        // copy to clipboard
+        var btns = document.querySelectorAll(".copy-text-button");
+        var clipboard = new ClipboardJS(btns);
+
+        clipboard.on("success", function (e) {
+            console.info("Action:", e.action);
+            console.info("Text:", e.text);
+            console.info("Trigger:", e.trigger);
+        });
+
+        clipboard.on("error", function (e) {
+            console.info("Action:", e.action);
+            console.info("Text:", e.text);
+            console.info("Trigger:", e.trigger);
+        });
+
+        // function to find the nth instance of character in string
+        function nthIndex(str, pat, n) {
+            var L = str.length, i = -1;
+            while (n-- && i++ < L) {
+                i = str.indexOf(pat, i);
+                if (i < 0) break;
+            }
+            return i;
+        }
+
+        function minifyAmzUrl(params) {
+        }
+
+        // form handling amz url
+        // this functions gets the input values
+        document.getElementById('getamzform').onsubmit = function values() {
+            const formValues = document.getElementById('amzurl').value;
+            if (formValues.startsWith('https://www.amazon.com/')) {
+                // minifiedUrl(formValues);
+                let getSlashIndex = nthIndex(formValues, '/', 5);
+                getSlashIndex = getSlashIndex + 1;
+                let sliceUptoAsin = formValues.slice(getSlashIndex);
+                let shortenedUrl = sliceUptoAsin.split('/')[0];
+                console.log(shortenedUrl);
+                document.querySelector('#amzoutput').innerHTML = `https://www.amazon.com/dp/${shortenedUrl}/`;
+
+            } else {
+                document.querySelector('#amzoutput').innerHTML = 'not a valid amz url';
+            }
+            return false; // prevents reload on form submit
+        };
+
+        // form handling wal upc code
+        // this functions gets the input values
+        // document.getElementById('getwalform').onsubmit = function values() {
+        //     const formValues = document.getElementById('walurl').value;
+        //     console.log(formValues);
+        //     document.querySelector('#waloutput').innerHTML = formValues;
+        //     return false; // prevents reload on form submit
+        // };
+
+        document.querySelectorAll('.reset-output').forEach(item => {
+            item.addEventListener('click', event => {
+                document.querySelector('#amzoutput').innerHTML = 'output';
+                // document.querySelector('#waloutput').innerHTML = 'output';
+            })
+        })
+    </script>
+</body>
+
+</html>
